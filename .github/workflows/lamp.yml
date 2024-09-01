@@ -47,6 +47,9 @@ jobs:
         username: sdevsoc
         password: ${{ secrets.SSH_PASSWORD }}  # Store the password in GitHub Secrets
         script: |
-          cd public_html/devsoc-website
+          cd public_html
+          ls -la
+          cd devsoc-website
           git pull
+          rm -rf ../dist
           ls -la
