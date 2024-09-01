@@ -49,5 +49,5 @@ jobs:
         script: |
           cd public_html/devsoc-website
           git pull
-          node index
+          nohup node index > output.log 2>&1 &
           
