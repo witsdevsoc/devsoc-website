@@ -49,11 +49,5 @@ jobs:
         script: |
           cd public_html/devsoc-website
           git pull
-          ls -la
-          cd ../
-          ls -la
-          rm -rf dist
-          ls -la
-          cp -r devsoc-website/dist dist
-          ls -la
+          node index
           
