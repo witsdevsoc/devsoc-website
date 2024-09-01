@@ -47,4 +47,5 @@ jobs:
         username: sdevsoc
         password: ${{ secrets.SSH_PASSWORD }}  # Store the password in GitHub Secrets
         script: |
+          cd public_html
           pwd
