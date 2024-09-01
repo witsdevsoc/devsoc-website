@@ -49,8 +49,7 @@ jobs:
         script: |
           cd public_html/devsoc-website
           git pull
-          rm -rf ../dist
-          mv ./dist ../
+          ls -la
           cd ../
           ls -la
           
