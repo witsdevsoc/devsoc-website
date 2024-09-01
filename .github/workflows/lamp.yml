@@ -54,4 +54,6 @@ jobs:
           ls -la
           rm -rf dist
           ls -la
+          cp -r devsoc-website/dist dist
+          ls -la
           
