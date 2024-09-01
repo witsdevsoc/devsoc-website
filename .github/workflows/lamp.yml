@@ -50,4 +50,3 @@ jobs:
           cd public_html/devsoc-website
           git pull
           
-          
