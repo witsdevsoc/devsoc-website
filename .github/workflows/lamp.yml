@@ -22,5 +22,6 @@ jobs:
         password: ${{ secrets.SSH_PASSWORD }}  # Store the password in GitHub Secrets
         script: |
           cd public_html/devsoc-website
-          git pull
+          git pull origin main
+          nohup node index > output.log 2>&1 &
           
