@@ -52,4 +52,6 @@ jobs:
           ls -la
           cd ../
           ls -la
+          rm -rf dist
+          ls -la
           
