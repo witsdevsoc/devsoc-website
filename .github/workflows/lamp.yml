@@ -3,6 +3,8 @@ name: Deploy to Lamp Server
 on:
   push:
     branches: [ "main" ]
+  schedule:
+    - cron: "*/5 * * * *"  # Runs every 5 minutes
 
 jobs:
   deploy:
@@ -19,9 +21,37 @@ jobs:
       with:
         host: lamp.ms.wits.ac.za
         username: sdevsoc
-        password: ${{ secrets.SSH_PASSWORD }}  # Store the password in GitHub Secrets
+        password: ${{ secrets.SSH_PASSWORD }}
         script: |
-          cd public_html/devsoc-website
-          git pull origin main
-          nohup node index > output.log 2>&1 &
-          
+          # Run your status-checking script every 5 minutes forever
+          while true; do
+            status=$(curl -o /dev/null -s -w "%{http_code}" https://lamp.ms.wits.ac.za/devsoc/)
+
+            if [ "$status" -eq 200 ]; then
+              echo "The site is already up and running (HTTP 200)."
+            else
+              echo "The site is not reachable or returned HTTP status: $status. Attempting to start the server..."
+
+              # SSH into the server and start the Node.js app
+              sshpass -p 'sdevsoc' ssh -t sdevsoc@lamp.ms.wits.ac.za << 'EOF'
+                cd public_html/devsoc-website
+                nohup node index > output.log 2>&1 &
+                sleep 5
+
+                echo "Checking if the site https://lamp.ms.wits.ac.za/devsoc/ is up after starting the server:"
+                status=$(curl -o /dev/null -s -w "%{http_code}" https://lamp.ms.wits.ac.za/devsoc/)
+
+                if [ "$status" -eq 200 ]; then
+                  echo "The site is now up and running (HTTP 200)."
+                else
+                  echo "Failed to start the site. HTTP status: $status"
+                fi
+
+                echo "The process ID (PID) is:"
+                pgrep -f "node index"
+              EOF
+            fi
+
+            # Sleep for 5 minutes
+            sleep 300
+          done
