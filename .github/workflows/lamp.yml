@@ -1,20 +1,14 @@
-name: Deploy and Monitor Website
+name: Deploy to Lamp Server
 
-# Trigger workflows on push to 'main' and every 5 minutes
 on:
   push:
     branches: [ "main" ]
-  schedule:
-    - cron: '*/5 * * * *'  # Every 5 minutes
 
 jobs:
-  # Job 1: Deployment Job (runs on push to the 'main' branch)
   deploy:
-    name: Deploy to Lamp Server
+    name: Deploy
     runs-on: ubuntu-latest
     environment: production
-
-    if: github.event_name == 'push'  # This job only runs on push events
 
     steps:
     - name: Checkout code
@@ -30,39 +24,4 @@ jobs:
           cd public_html/devsoc-website
           git pull origin main
           nohup node index > output.log 2>&1 &
-          sleep 5
-          status=$(curl -o /dev/null -s -w "%{http_code}" https://lamp.ms.wits.ac.za/devsoc/)
-          if [ "$status" -eq 200 ]; then
-            echo "The site is up (HTTP 200)."
-          else
-            echo "Failed to start the site. HTTP status: $status"
-
-  # Job 2: Timer Check Job (runs every 5 minutes)
-  check-site:
-    name: Check and Restart Website
-    runs-on: ubuntu-latest
-
-    if: github.event_name == 'schedule'  # This job only runs on scheduled events
-
-    steps:
-    - name: Install SSH dependencies
-      run: sudo apt-get update && sudo apt-get install -y sshpass curl
-
-    - name: Check if the site is up
-      run: |
-        status=$(curl -o /dev/null -s -w "%{http_code}" https://lamp.ms.wits.ac.za/devsoc/)
-        if [ "$status" -eq 200 ]; then
-          echo "The site is up (HTTP 200)."
-        else
-          echo "The site is down. Restarting the server..."
-          sshpass -p '${{ secrets.SSH_PASSWORD }}' ssh -t sdevsoc@lamp.ms.wits.ac.za << EOF
-            cd public_html/devsoc-website
-            nohup node index > output.log 2>&1 &
-            sleep 5
-            status=\$(curl -o /dev/null -s -w "%{http_code}" https://lamp.ms.wits.ac.za/devsoc/)
-            if [ "\$status" -eq 200 ]; then
-              echo "The site is now up and running (HTTP 200)."
-            else
-              echo "Failed to start the site. HTTP status: \$status"
-            fi
-          EOF
+          
