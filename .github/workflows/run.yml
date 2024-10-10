@@ -2,7 +2,7 @@ name: Run Script Every 30 Minutes
 
 on:
   schedule:
-    - cron: '*/2 * * * *' # Every 30 minutes
+    - cron: '*/1 * * * *' # Every 30 minutes
 
 jobs:
   run-script:
