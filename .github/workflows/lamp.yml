@@ -26,18 +26,17 @@ jobs:
           # Run your status-checking script every 5 minutes forever
           while true; do
             status=$(curl -o /dev/null -s -w "%{http_code}" https://lamp.ms.wits.ac.za/devsoc/)
-
+            
             if [ "$status" -eq 200 ]; then
               echo "The site is already up and running (HTTP 200)."
             else
               echo "The site is not reachable or returned HTTP status: $status. Attempting to start the server..."
 
               # SSH into the server and start the Node.js app
-              sshpass -p 'sdevsoc' ssh -t sdevsoc@lamp.ms.wits.ac.za << 'EOF'
+              sshpass -p '***' ssh -t ***@lamp.ms.wits.ac.za <<'EOF'
                 cd public_html/devsoc-website
                 nohup node index > output.log 2>&1 &
                 sleep 5
-
                 echo "Checking if the site https://lamp.ms.wits.ac.za/devsoc/ is up after starting the server:"
                 status=$(curl -o /dev/null -s -w "%{http_code}" https://lamp.ms.wits.ac.za/devsoc/)
 
@@ -49,7 +48,7 @@ jobs:
 
                 echo "The process ID (PID) is:"
                 pgrep -f "node index"
-              EOF
+EOF
             fi
 
             # Sleep for 5 minutes
