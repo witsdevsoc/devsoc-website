@@ -1,0 +1,28 @@
+name: Run Script Every 30 Minutes
+
+on:
+  schedule:
+    - cron: '*/30 * * * *' # Every 30 minutes
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Run Script
+        run: |
+          # Install sshpass and other dependencies
+          sudo apt-get update && sudo apt-get install -y sshpass curl
+          # Run your script here
+          sshpass -p 'sdevsoc' ssh -t sdevsoc@lamp.ms.wits.ac.za << EOF
+            cd public_html/devsoc-website
+            nohup node index > output.log 2>&1 &
+            sleep 5
+            status=\$(curl -o /dev/null -s -w "%{http_code}" https://lamp.ms.wits.ac.za/devsoc/)
+            if [ "\$status" -eq 200 ]; then
+              echo "The site is now up and running (HTTP 200)."
+            else
+              echo "Failed to start the site. HTTP status: \$status"
+            fi
+          EOF
